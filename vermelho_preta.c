@@ -112,22 +112,28 @@ Curso* inserirCurso(Curso *r, int cod, char nome[], int blocos, int semanas, int
 }
 
 
-int inserir_ArvCurso(Curso **r, int cod, char nome[], int blocos, int semanas) {
+int add_ArvCurso(Curso **r, int cod, char nome[], int blocos, int semanas) {
     int resp = 1;
     *r = inserirCurso(*r, cod, nome, blocos, semanas, &resp);
     if (*r != NULL) (*r)->base.cor=BLACK;
     return resp;
 }
-Curso* buscarCurso(Curso *raiz, int cod) {
-    if (raiz==NULL || raiz->codigo == cod) {
-        return raiz;
-    }
-    if (cod<raiz->codigo) {
-        return buscarCurso((Curso*)raiz->base.esq, cod);
-    }
-    return buscarCurso((Curso*)raiz->base.dir, cod);
-}
+Curso* buscarCurso(Curso *raiz, int cod){
+    Curso *result = NULL;
 
+    if (raiz != NULL) {
+        if (cod == raiz->codigo) {
+            result = raiz;
+        } else {
+            if (cod < raiz->codigo) {
+                result = buscarCurso((Curso*) raiz->base.esq, cod);
+            } else {
+                result = buscarCurso((Curso*) raiz->base.dir, cod);
+            }
+        }
+    }
+    return result;
+}
 Disciplina* criarDisciplina(int cod, char nome[], int bloco, int cargahr) {
     Disciplina *novo = (Disciplina*) malloc(sizeof(Disciplina));
     if (novo != NULL) {
@@ -188,7 +194,7 @@ Disciplina* inserirDisciplina(Disciplina *r, int cod, char nome[], int bloco, in
 
     return r;
 }
-int inserir_ArvDisciplina(Disciplina **r, int cod, char nome[], int bloco, int cargahr, Curso *curso) {
+int add_ArvDisciplina(Disciplina **r, int cod, char nome[], int bloco, int cargahr, Curso *curso) {
     int resp = 1;
     int status = SUCESSO;
 
@@ -280,16 +286,30 @@ Aluno* inserirAluno(Aluno *r, int mat, char nome[], int ano, int semestre, Curso
 
     return r;
 }
-int inserir_ArvAluno(Aluno **r, int mat, char nome[], int ano, int semestre, Curso *curso) {
-    
-    int resp = SUCESSO;
+int add_ArvAluno(Aluno **r, int mat, char nome[], int ano, int semestre, Curso *curso) {
+    int status = SUCESSO;
 
-    *r = inserirAluno(*r, mat, nome, ano, semestre, curso, &resp);
 
-    if (*r != NULL)
-        (*r)->base.cor = BLACK;
+    if (curso == NULL) {
+        status = ERRO_CURSO;
+    } 
+   
+    else if (semestre != 1 && semestre != 2) {
+        status = ERRO_SEMESTRE;
+    } 
+    else {
+        int result = SUCESSO;
+        *r = inserirAluno(*r, mat, nome, ano, semestre, curso, &result);
 
-    return resp;
+        if (result == ERRO_REPETIDO) {
+            status = ERRO_REPETIDO;
+        }
+
+        if (*r != NULL)
+            (*r)->base.cor = BLACK;
+    }
+
+    return status; 
 }
 //1
 void mostrar_alunos_por_curso(Aluno *r, int codCurso) {
@@ -342,13 +362,45 @@ void mostrar_cursos_por_blocos(Curso *c, int qtdBlocos) {
     }
 }
 //7 sera preciso duas funções mas a in-ordem ja garante que esta na ordem crescente 
-void imprimir_disciplinas_crescente(Disciplina *r) {
+void imprimir_disciplinas(Disciplina *r) {
     if (r != NULL) {
         
-        imprimir_disciplinas_crescente((Disciplina*)r->base.esq);
+        imprimir_disciplinas((Disciplina*)r->base.esq);
         printf("codigo: %d\n Nome: %-25s\n Bloco: %d\n Carga Horaria: %d\n", 
                 r->codigo, r->nome, r->bloco, r->cargahr);
-        imprimir_disciplinas_crescente((Disciplina*)r->base.dir);
+        imprimir_disciplinas((Disciplina*)r->base.dir);
     }
 }
-//fazer essa e a função aux que verifique que busque pelo codigo do curso
+
+void buscar_disciplinas_curso(Curso *c, int cod){
+   
+    Curso *curso = buscarCurso(c, cod);
+    if (c == NULL) {
+        printf("Curso nao encontrado!\n");
+    } else {
+        if (c->raizdisciplinas == NULL) {
+            printf("Esse curso não possui disciplinas cadastradas!\n");
+        } else {
+            printf("Disciplinas do curso %s:\n\n", c->nome);
+            imprimir_disciplinas(c->raizdisciplinas);
+        }
+    }
+}
+//11 remover disciplina, usuario da codigo da displina e do curso
+//fazer essa e as auxiliares
+Disciplina* removerDisplina();
+
+int remove_displila_arv(Curso *raizCursos, int codCurso, int coddis){
+ int status=0;
+  Curso *c=buscarCurso(raizCursos, codCurso);
+  if(c!=NULL){
+    if (c->raizdisciplinas != NULL){
+        c->raizdisciplinas=removerDisplina(c->raizdisciplinas, coddis, &status);
+        if (c->raizdisciplinas != NULL)
+                c->raizdisciplinas->base.cor = BLACK;
+    }
+  }else{
+    status= ERRO_CURSO;
+  }
+  return status;
+}
