@@ -12,6 +12,7 @@
 #define ERRO_REPETIDO 5
 
 #include "vermelho_preta.h"
+
 int cor(Nobase *raiz) {
     if (raiz == NULL) 
        return BLACK;
@@ -239,23 +240,14 @@ Aluno* criarAluno(int mat, char nome[], int ano, int semestre, Curso *curso) {
 Aluno* inserirAluno(Aluno *r, int mat, char nome[], int ano, int semestre, Curso *curso, int *resp) {
 
     if (r == NULL) {
-
-        if (curso == NULL || (semestre != 1 && semestre != 2)) {
-            *resp = ERRO_SEMESTRE;
-        } 
-        else {
-            r = criarAluno(mat, nome, ano, semestre, curso);
-            *resp = SUCESSO;
-        }
-
+        r = criarAluno(mat, nome, ano, semestre, curso);
+        *resp = SUCESSO;
     } 
     else {
 
         if (mat < r->matricula) {
 
-            r->base.esq = (Nobase*)inserirAluno(
-                (Aluno*)r->base.esq,
-                mat, nome, ano, semestre, curso, resp
+            r->base.esq = (Nobase*)inserirAluno( (Aluno*)r->base.esq,mat, nome, ano, semestre, curso, resp
             );
 
         } 
@@ -286,6 +278,7 @@ Aluno* inserirAluno(Aluno *r, int mat, char nome[], int ano, int semestre, Curso
 
     return r;
 }
+
 int add_ArvAluno(Aluno **r, int mat, char nome[], int ano, int semestre, Curso *curso) {
     int status = SUCESSO;
 
@@ -386,8 +379,7 @@ void buscar_disciplinas_curso(Curso *c, int cod){
         }
     }
 }
-//11 remover disciplina, usuario da codigo da displina e do curso
-//fazer essa e as auxiliares
+
 Disciplina* removerDisplina();
 
 int remove_displila_arv(Curso *raizCursos, int codCurso, int coddis){
