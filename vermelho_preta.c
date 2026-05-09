@@ -10,6 +10,7 @@
 #define ERRO_CARGA 3
 #define ERRO_SEMESTRE 4
 #define ERRO_REPETIDO 5
+#define ERRO_DISCIPLINA 6
 
 #include "vermelho_preta.h"
 
@@ -61,7 +62,6 @@ Curso* criarCurso(int cod, char nome[], int blocos, int semanas){
 }
 
 Curso* inserirCurso(Curso *r, int cod, char nome[], int blocos, int semanas, int *resp) {
-
     if (r == NULL) {
 
         if (blocos <= 0 || semanas <= 0) {
@@ -112,7 +112,6 @@ Curso* inserirCurso(Curso *r, int cod, char nome[], int blocos, int semanas, int
     return r;
 }
 
-
 int add_ArvCurso(Curso **r, int cod, char nome[], int blocos, int semanas) {
     int resp = 1;
     *r = inserirCurso(*r, cod, nome, blocos, semanas, &resp);
@@ -155,6 +154,7 @@ Disciplina* inserirDisciplina(Disciplina *r, int cod, char nome[], int bloco, in
 
     if (r == NULL) {
         r = criarDisciplina(cod, nome, bloco, cargahr);
+        *resp = SUCESSO;
     } 
     else {
 
@@ -214,11 +214,33 @@ int add_ArvDisciplina(Disciplina **r, int cod, char nome[], int bloco, int carga
         if (*r != NULL)
             (*r)->base.cor = BLACK;
 
-        if (resp == 0)
+        if (resp ==  ERRO_REPETIDO)
             status = ERRO_REPETIDO;
     }
 
     return status;
+}
+Disciplina* buscarDisciplina(Disciplina *r, int cod) {
+
+    Disciplina *result = NULL;
+
+    if (r != NULL) {
+
+        if (cod == r->codigo) {
+            result = r;
+        } else {
+            if (cod < r->codigo) {
+                result = buscarDisciplina(
+                    (Disciplina*) r->base.esq,
+                    cod
+                );
+            } else {
+                result = buscarDisciplina( (Disciplina*) r->base.dir,  cod
+                );
+            }
+        }
+    }
+    return result;
 }
 
 Aluno* criarAluno(int mat, char nome[], int ano, int semestre, Curso *curso) {
@@ -368,31 +390,186 @@ void imprimir_disciplinas(Disciplina *r) {
 void buscar_disciplinas_curso(Curso *c, int cod){
    
     Curso *curso = buscarCurso(c, cod);
-    if (c == NULL) {
+    if (curso == NULL) {
         printf("Curso nao encontrado!\n");
     } else {
-        if (c->raizdisciplinas == NULL) {
+        if (curso->raizdisciplinas == NULL) {
             printf("Esse curso não possui disciplinas cadastradas!\n");
         } else {
-            printf("Disciplinas do curso %s:\n\n", c->nome);
-            imprimir_disciplinas(c->raizdisciplinas);
+            printf("Disciplinas do curso %s:\n\n", curso->nome);
+            imprimir_disciplinas(curso->raizdisciplinas);
         }
     }
 }
+//Lucrecia essas funções são auxuliares das funções de remoção use então não precisa fazer elas novamente so fazer 
+// a função 12 normal tenta seguir a mesma estrutura de remoção da 11 que fez aqui a baixo
 
-Disciplina* removerDisplina();
+Nobase* moverDireitaRED(Nobase *r) {
 
-int remove_displila_arv(Curso *raizCursos, int codCurso, int coddis){
- int status=0;
-  Curso *c=buscarCurso(raizCursos, codCurso);
-  if(c!=NULL){
-    if (c->raizdisciplinas != NULL){
-        c->raizdisciplinas=removerDisplina(c->raizdisciplinas, coddis, &status);
-        if (c->raizdisciplinas != NULL)
-                c->raizdisciplinas->base.cor = BLACK;
+    trocaCor(r);
+
+    if (r->esq != NULL && r->esq->esq != NULL && cor(r->esq->esq) == RED) {
+
+        r = rotacionaDireita(r);
+
+        trocaCor(r);
     }
-  }else{
-    status= ERRO_CURSO;
-  }
-  return status;
+
+    return r;
+}
+Nobase* moverEsquerdaRED(Nobase *r) {
+
+    trocaCor(r);
+
+    if (r->dir != NULL && r->dir->esq != NULL && cor(r->dir->esq) == RED) {
+
+        r->dir = rotacionaDireita(r->dir);
+
+        r = rotacionaEsquerda(r);
+
+        trocaCor(r);
+    }
+
+    return r;
+}
+Nobase* balancear(Nobase *r) {
+
+    if (cor(r->dir) == RED)
+        r = rotacionaEsquerda(r);
+
+    if (cor(r->esq) == RED &&
+        cor(r->esq->esq) == RED)
+        r = rotacionaDireita(r);
+
+    if (cor(r->esq) == RED &&
+        cor(r->dir) == RED)
+        trocaCor(r);
+
+    return r;
+}
+Nobase* procurarMenor(Nobase *r) {
+
+    Nobase *atual = r;
+
+    while (atual != NULL && atual->esq != NULL) {
+        atual = atual->esq;
+    }
+
+    return atual;
+}
+Nobase* removerMenor(Nobase *r) {
+
+    if (r->esq == NULL) {
+        free(r);
+        return NULL;
+    }
+
+    if (cor(r->esq) == BLACK &&
+        cor(r->esq->esq) == BLACK)
+        r = moverEsquerdaRED(r);
+
+    r->esq = removerMenor(r->esq);
+
+    return balancear(r);
+}
+//função 11:
+
+Disciplina* removerDisciplina(Disciplina *r, int cod) {
+
+    if (cod < r->codigo) {
+
+        if (cor(r->base.esq) == BLACK &&
+            cor(r->base.esq->esq) == BLACK) {
+
+            r = (Disciplina*) moverEsquerdaRED((Nobase*) r);
+        }
+
+        r->base.esq =
+            (Nobase*) removerDisciplina(
+                (Disciplina*) r->base.esq,
+                cod
+            );
+
+    } else {
+
+        if (cor(r->base.esq) == RED)
+            r = (Disciplina*) rotacionaDireita((Nobase*) r);
+
+        if (cod == r->codigo &&
+            r->base.dir == NULL) {
+
+            free(r);
+            r = NULL;
+        }
+
+        else {
+
+            if (cor(r->base.dir) == BLACK &&
+                cor(r->base.dir->esq) == BLACK) {
+
+                r = (Disciplina*) moverDireitaRED((Nobase*) r);
+            }
+
+            if (cod == r->codigo) {
+                Disciplina *aux;
+
+                aux = (Disciplina*)
+                 procurarMenor(r->base.dir);
+
+                r->codigo = aux->codigo;
+                strcpy(r->nome, aux->nome);
+                r->bloco = aux->bloco;
+                r->cargahr = aux->cargahr;
+
+                r->base.dir = removerMenor(r->base.dir);
+
+            } else {
+
+                r->base.dir =
+                    (Nobase*) removerDisciplina(
+                        (Disciplina*) r->base.dir,
+                        cod
+                    );
+            }
+        }
+    }
+
+    if (r != NULL)
+        r = (Disciplina*) balancear((Nobase*) r);
+
+    return r;
+}
+
+int remove_disciplina_arv(Curso *raizCursos, int codCurso, int codDisc) {
+    int status = SUCESSO;
+    Curso *curso;
+    Disciplina *disciplina;
+
+    curso = buscarCurso(raizCursos, codCurso);
+
+    if (curso == NULL) {
+
+        status = ERRO_CURSO;
+
+    } else {
+
+        disciplina = buscarDisciplina(curso->raizdisciplinas, codDisc
+        );
+        
+        if (disciplina == NULL) {
+            status = ERRO_DISCIPLINA;
+        } else {
+
+            curso->raizdisciplinas =
+                removerDisciplina(
+                    curso->raizdisciplinas,
+                    codDisc
+                );
+
+            if (curso->raizdisciplinas != NULL)
+                curso->raizdisciplinas->base.cor = BLACK;
+        }
+    }
+
+    return status;
 }
