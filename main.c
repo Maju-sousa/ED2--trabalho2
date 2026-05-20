@@ -67,16 +67,16 @@ static void menu_cadastrar_curso(Curso **raizCursos) {
 
     switch (resp) {
         case SUCESSO:
-            printf("[OK] Curso cadastrado com sucesso.\n");
+            printf("Curso cadastrado com sucesso.\n");
             break;
         case ERRO_REPETIDO:
-            printf("[ERRO] Codigo de curso ja cadastrado.\n");
+            printf(" Codigo de curso ja cadastrado.\n");
             break;
         case ERRO_CURSO:
-            printf("[ERRO] Blocos e semanas devem ser maiores que zero.\n");
+            printf("Blocos e semanas devem ser maiores que zero.\n");
             break;
         default:
-            printf("[ERRO] Falha no cadastro do curso.\n");
+            printf("Falha no cadastro do curso.\n");
     }
 }
 
@@ -94,7 +94,7 @@ static void menu_cadastrar_disciplina(Curso *raizCursos) {
     curso = buscarCurso(raizCursos, codCurso);
 
     if (curso == NULL) {
-        printf("[ERRO] Curso nao encontrado.\n");
+        printf("Curso nao encontrado.\n");
         return;
     }
 
@@ -121,24 +121,24 @@ static void menu_cadastrar_disciplina(Curso *raizCursos) {
 
     switch (resp) {
         case SUCESSO:
-            printf("[OK] Disciplina cadastrada com sucesso.\n");
+            printf("Disciplina cadastrada com sucesso.\n");
             break;
         case ERRO_REPETIDO:
-            printf("[ERRO] Codigo de disciplina ja cadastrado neste curso.\n");
+            printf("Codigo de disciplina ja cadastrado neste curso.\n");
             break;
         case ERRO_BLOCO:
-            printf("[ERRO] Bloco invalido (deve ser menor que %d).\n",
+            printf("Bloco invalido (deve ser menor que %d).\n",
                    curso->qtdBlocos);
             break;
         case ERRO_CARGA:
-            printf("[ERRO] Carga horaria deve ser multiplo de %d.\n",
+            printf("Carga horaria deve ser multiplo de %d.\n",
                    curso->semanas);
             break;
         case ERRO_CURSO:
-            printf("[ERRO] Curso invalido.\n");
+            printf(" Curso invalido.\n");
             break;
         default:
-            printf("[ERRO] Falha no cadastro da disciplina.\n");
+            printf("Falha no cadastro da disciplina.\n");
     }
 }
 
@@ -164,7 +164,7 @@ static void menu_cadastrar_aluno(Aluno **raizAlunos, Curso *raizCursos) {
     curso = buscarCurso(raizCursos, codCurso);
 
     if (curso == NULL) {
-        printf("[ERRO] Curso nao encontrado.\n");
+        printf(" Curso nao encontrado.\n");
         return;
     }
 
@@ -179,19 +179,19 @@ static void menu_cadastrar_aluno(Aluno **raizAlunos, Curso *raizCursos) {
 
     switch (resp) {
         case SUCESSO:
-            printf("[OK] Aluno cadastrado com sucesso.\n");
+            printf("Aluno cadastrado com sucesso.\n");
             break;
         case ERRO_REPETIDO:
-            printf("[ERRO] Matricula ja cadastrada.\n");
+            printf(" Matricula ja cadastrada.\n");
             break;
         case ERRO_SEMESTRE:
-            printf("[ERRO] Semestre invalido (informe 1 ou 2).\n");
+            printf("Semestre invalido (informe 1 ou 2).\n");
             break;
         case ERRO_CURSO:
-            printf("[ERRO] Curso invalido.\n");
+            printf("Curso invalido.\n");
             break;
         default:
-            printf("[ERRO] Falha no cadastro do aluno.\n");
+            printf("Falha no cadastro do aluno.\n");
     }
 }
 
@@ -209,7 +209,7 @@ static void menu_contar_alunos(Aluno *raizAlunos, Curso *raizCursos) {
     curso = buscarCurso(raizCursos, codCurso);
 
     if (curso == NULL) {
-        printf("[ERRO] Curso nao encontrado.\n");
+        printf("Curso nao encontrado.\n");
         return;
     }
 
@@ -225,7 +225,7 @@ static void menu_imprimir_cursos(Curso *raizCursos) {
     printf("\n--- CURSOS EM ORDEM CRESCENTE ---\n");
 
     if (raizCursos == NULL) {
-        printf("[INFO] Nenhum curso cadastrado.\n");
+        printf("Nenhum curso cadastrado.\n");
         return;
     }
 
@@ -251,13 +251,13 @@ static void menu_buscar_disciplina(Curso *raizCursos) {
         case SUCESSO:
             break;
         case ERRO_CURSO:
-            printf("[ERRO] Curso nao encontrado.\n");
+            printf(" Curso nao encontrado.\n");
             break;
         case ERRO_DISCIPLINA:
-            printf("[ERRO] Disciplina nao encontrada neste curso.\n");
+            printf("Disciplina nao encontrada neste curso.\n");
             break;
         default:
-            printf("[ERRO] Falha na busca.\n");
+            printf("Falha na busca.\n");
     }
 }
 
@@ -280,13 +280,13 @@ static void menu_listar_disciplinas_por_bloco(Curso *raizCursos) {
         case SUCESSO:
             break;
         case ERRO_CURSO:
-            printf("[ERRO] Curso nao encontrado.\n");
+            printf("Curso nao encontrado.\n");
             break;
         case ERRO_DISCIPLINA:
-            printf("[INFO] Nenhuma disciplina encontrada no bloco %d.\n", bloco);
+            printf("Nenhuma disciplina encontrada no bloco %d.\n", bloco);
             break;
         default:
-            printf("[ERRO] Falha na busca.\n");
+            printf("Falha na busca.\n");
     }
 }
 
@@ -309,13 +309,13 @@ static void menu_listar_disciplinas_por_carga(Curso *raizCursos) {
         case SUCESSO:
             break;
         case ERRO_CURSO:
-            printf("[ERRO] Curso nao encontrado.\n");
+            printf(" Curso nao encontrado.\n");
             break;
         case ERRO_DISCIPLINA:
-            printf("[INFO] Nenhuma disciplina encontrada com carga de %d h.\n", cargahr);
+            printf(" Nenhuma disciplina encontrada com carga de %d h.\n", cargahr);
             break;
         default:
-            printf("[ERRO] Falha na busca.\n");
+            printf("Falha na busca.\n");
     }
 }
 
@@ -333,16 +333,16 @@ static void menu_remover_curso(Curso **raizCursos) {
 
     switch (status) {
         case SUCESSO:
-            printf("[OK] Curso removido com sucesso.\n");
+            printf("Curso removido com sucesso.\n");
             break;
         case ERRO_CURSO:
-            printf("[ERRO] Curso nao encontrado.\n");
+            printf(" Curso nao encontrado.\n");
             break;
         case ERRO_DISCIPLINA:
-            printf("[ERRO] O curso possui disciplinas cadastradas e nao pode ser removido.\n");
+            printf("O curso possui disciplinas cadastradas e nao pode ser removido.\n");
             break;
         default:
-            printf("[ERRO] Falha na remocao do curso.\n");
+            printf("Falha na remocao do curso.\n");
     }
 }
 
@@ -360,7 +360,7 @@ static void menu_mostrar_alunos_por_curso(Aluno *raizAlunos,
     curso = buscarCurso(raizCursos, codCurso);
 
     if (curso == NULL) {
-        printf("[ERRO] Curso nao encontrado.\n");
+        printf(" Curso nao encontrado.\n");
     } else {
         printf("\nAlunos do curso: %s (cod. %d)\n",
                curso->nome, curso->codigo);
@@ -387,7 +387,7 @@ static void menu_mostrar_alunos_por_ano(Aluno *raizAlunos,
     curso = buscarCurso(raizCursos, codCurso);
 
     if (curso == NULL) {
-        printf("[ERRO] Curso nao encontrado.\n");
+        printf("Curso nao encontrado.\n");
     } else {
         printf("\nAlunos do curso: %s (cod. %d) — ano %d\n",
                curso->nome, curso->codigo, ano);
@@ -414,16 +414,16 @@ static void menu_remover_disciplina(Curso *raizCursos) {
 
     switch (status) {
         case SUCESSO:
-            printf("[OK] Disciplina removida com sucesso.\n");
+            printf("Disciplina removida com sucesso.\n");
             break;
         case ERRO_CURSO:
-            printf("[ERRO] Curso nao encontrado.\n");
+            printf("Curso nao encontrado.\n");
             break;
         case ERRO_DISCIPLINA:
-            printf("[ERRO] Disciplina nao encontrada neste curso.\n");
+            printf("Disciplina nao encontrada neste curso.\n");
             break;
         default:
-            printf("[ERRO] Falha na remocao da disciplina.\n");
+            printf("Falha na remocao da disciplina.\n");
     }
 }
 
@@ -468,7 +468,7 @@ static void menu_imprimir_disciplinas(Curso *raizCursos) {
     curso = buscarCurso(raizCursos, codCurso);
 
     if (curso == NULL) {
-        printf("[ERRO] Curso nao encontrado.\n");
+        printf("Curso nao encontrado.\n");
     } else {
         printf("\nDisciplinas do curso: %s (cod. %d)\n",
                curso->nome, curso->codigo);
@@ -589,7 +589,7 @@ int main(void) {
 
             default:
                 printf(
-                    "[AVISO] Opcao invalida. Tente novamente.\n"
+                    "Opcao invalida. Tente novamente.\n"
                 );
         }
 
