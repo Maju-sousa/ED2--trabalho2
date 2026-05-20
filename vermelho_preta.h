@@ -6,14 +6,13 @@
 
 #define SUCESSO        1
 #define ERRO_CURSO     0
-#define ERRO_BLOCO     2
-#define ERRO_CARGA     3
-#define ERRO_SEMESTRE  4
 #define ERRO_REPETIDO  5
 #define ERRO_DISCIPLINA 6
 
-typedef struct Curso      Curso;
+typedef struct Nobase Nobase;
+typedef struct Curso Curso;
 typedef struct Disciplina Disciplina;
+typedef struct Aluno Aluno;
 
 typedef struct Nobase {
     struct Nobase *esq;
@@ -47,59 +46,217 @@ typedef struct Disciplina {
     int    cargahr;
 } Disciplina;
 
-int     cor(Nobase *raiz);
-void    trocaCor(Nobase *raiz);
-Nobase *rotacionaEsquerda(Nobase *raiz);
-Nobase *rotacionaDireita(Nobase *raiz);
+int cor(Nobase *raiz);
 
-Curso *criarCurso(int cod, char nome[], int blocos, int semanas);
-Curso *inserirCurso(Curso *r, int cod, char nome[], int blocos,
-                    int semanas, int *resp);
-int    add_ArvCurso(Curso **r, int cod, char nome[], int blocos,
-                    int semanas);
-Curso *buscarCurso(Curso *raiz, int cod);
+void trocaCor(Nobase *raiz);
 
-Disciplina *criarDisciplina(int cod, char nome[], int bloco, int cargahr);
-Disciplina *inserirDisciplina(Disciplina *r, int cod, char nome[],
-                               int bloco, int cargahr, int *resp);
-int         add_ArvDisciplina(Disciplina **r, int cod, char nome[],
-                               int bloco, int cargahr, Curso *curso);
-Disciplina *buscarDisciplina(Disciplina *r, int cod);
+Nobase* rotacionaEsquerda(Nobase *raiz);
 
-Aluno *criarAluno(int mat, char nome[], int ano, int semestre, Curso *curso);
-Aluno *inserirAluno(Aluno *r, int mat, char nome[], int ano,
-                    int semestre, Curso *curso, int *resp);
-int    add_ArvAluno(Aluno **r, int mat, char nome[], int ano,
-                    int semestre, Curso *curso);
+Nobase* rotacionaDireita(Nobase *raiz);
 
-void mostrar_alunos_por_curso(Aluno *r, int codCurso);
-void mostrar_alunos_por_ano(Aluno *a, int codCurso, int ano);
+Nobase* moverDireitaRED(Nobase *r);
 
-void contar_alunos_por_curso(Aluno *r, int codCurso, int *contador);
+Nobase* moverEsquerdaRED(Nobase *r);
 
-void imprimir_cursos_em_ordem(Curso *r);
+Nobase* balancear(Nobase *r);
 
-void mostrar_curso(Curso *r, int codCurso);
-void mostrar_cursos_por_blocos(Curso *c, int qtdBlocos);
-void imprimir_disciplinas(Disciplina *r);
+Nobase* procurarMenor(Nobase *r);
 
-void imprimir_dados_disciplina(Curso *raizCursos,
-                                int codCurso,
-                                int codDisciplina,
-                                int *flag);
-void listar_disciplinas_por_bloco(Curso *raizCursos, int codCurso, int bloco,    int *flag);
-void listar_disciplinas_por_carga(Curso *raizCursos, int codCurso, int cargahr,  int *flag);
+Nobase* removerMenor(Nobase *r);
 
-Nobase *moverDireitaRED(Nobase *r);
-Nobase *moverEsquerdaRED(Nobase *r);
-Nobase *balancear(Nobase *r);
-Nobase *procurarMenor(Nobase *r);
-Nobase *removerMenor(Nobase *r);
+//CURSO
 
-Curso *removerCurso(Curso *r, int cod);
-int    remove_curso_arv(Curso **raizCursos, int codCurso);
+Curso* criarCurso(
+    int cod,
+    char nome[],
+    int blocos,
+    int semanas
+);
 
-Disciplina *removerDisciplina(Disciplina *r, int cod);
-int         remove_disciplina_arv(Curso *raizCursos, int codCurso, int codDisc);
+Curso* inserirCurso(
+    Curso *r,
+    int cod,
+    char nome[],
+    int blocos,
+    int semanas,
+    int *resp
+);
 
-#endif 
+int add_ArvCurso(
+    Curso **r,
+    int cod,
+    char nome[],
+    int blocos,
+    int semanas
+);
+
+Curso* buscarCurso(
+    Curso *raiz,
+    int cod
+);
+
+void imprimir_cursos_em_ordem(
+    Curso *r
+);
+
+void mostrar_curso(
+    Curso *r,
+    int codCurso
+);
+
+void mostrar_cursos_por_blocos(
+    Curso *c,
+    int qtdBlocos
+);
+
+Curso* removerCurso(
+    Curso *r,
+    int cod
+);
+
+int remove_curso_arv(
+    Curso **raizCursos,
+    int codCurso
+);
+
+
+///DISCIPLINA
+
+
+Disciplina* criarDisciplina(
+    int cod,
+    char nome[],
+    int bloco,
+    int cargahr
+);
+
+Disciplina* inserirDisciplina(
+    Disciplina *r,
+    int cod,
+    char nome[],
+    int bloco,
+    int cargahr,
+    int *resp
+);
+
+int add_ArvDisciplina(
+    Disciplina **r,
+    int cod,
+    char nome[],
+    int bloco,
+    int cargahr,
+    Curso *curso
+);
+
+Disciplina* buscarDisciplina(
+    Disciplina *r,
+    int cod
+);
+
+void imprimir_disciplinas(
+    Disciplina *r
+);
+
+void buscar_disciplinas_curso(
+    Curso *c,
+    int cod
+);
+
+void imprimir_dados_disciplina(
+    Curso *raizCursos,
+    int codCurso,
+    int codDisciplina,
+    int *flag
+);
+
+void _listar_disciplinas_por_bloco(
+    Disciplina *r,
+    int bloco,
+    int *flag
+);
+
+void listar_disciplinas_por_bloco(
+    Curso *raizCursos,
+    int codCurso,
+    int bloco,
+    int *flag
+);
+
+void _listar_disciplinas_por_carga(
+    Disciplina *r,
+    int cargahr,
+    int *flag
+);
+
+void listar_disciplinas_por_carga(
+    Curso *raizCursos,
+    int codCurso,
+    int cargahr,
+    int *flag
+);
+
+Disciplina* removerDisciplina(
+    Disciplina *r,
+    int cod
+);
+
+int remove_disciplina_arv(
+    Curso *raizCursos,
+    int codCurso,
+    int codDisc
+);
+
+//ALUNOS
+
+
+Aluno* criarAluno(
+    int mat,
+    char nome[],
+    int ano,
+    int semestre,
+    Curso *curso
+);
+
+Aluno* inserirAluno(
+    Aluno *r,
+    int mat,
+    char nome[],
+    int ano,
+    int semestre,
+    Curso *curso,
+    int *resp
+);
+
+int add_ArvAluno(
+    Aluno **r,
+    int mat,
+    char nome[],
+    int ano,
+    int semestre,
+    Curso *curso
+);
+
+Aluno* buscarAluno(
+    Aluno *r,
+    int mat
+);
+
+void mostrar_alunos_por_curso(
+    Aluno *r,
+    int codCurso
+);
+
+void mostrar_alunos_por_ano(
+    Aluno *a,
+    int codCurso,
+    int ano
+);
+
+void contar_alunos_por_curso(
+    Aluno *r,
+    int codCurso,
+    int *contador
+);
+
+#endif
+
