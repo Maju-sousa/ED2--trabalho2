@@ -4,13 +4,6 @@
 #define RED 1
 #define BLACK 0
 
-#define SUCESSO 1
-#define ERRO_CURSO 0
-#define ERRO_BLOCO 2
-#define ERRO_CARGA 3
-#define ERRO_SEMESTRE 4
-#define ERRO_REPETIDO 5
-#define ERRO_DISCIPLINA 6
 
 #include "vermelho_preta.h"
 
@@ -64,12 +57,8 @@ Curso* criarCurso(int cod, char nome[], int blocos, int semanas){
 Curso* inserirCurso(Curso *r, int cod, char nome[], int blocos, int semanas, int *resp) {
     if (r == NULL) {
 
-        if (blocos <= 0 || semanas <= 0) {
-            *resp = ERRO_CURSO;
-        } else {
             r = criarCurso(cod, nome, blocos, semanas);
             *resp = SUCESSO;
-        }
 
     } else {
 
@@ -115,7 +104,8 @@ Curso* inserirCurso(Curso *r, int cod, char nome[], int blocos, int semanas, int
 int add_ArvCurso(Curso **r, int cod, char nome[], int blocos, int semanas) {
     int resp = 1;
     *r = inserirCurso(*r, cod, nome, blocos, semanas, &resp);
-    if (*r != NULL) (*r)->base.cor=BLACK;
+    if (*r != NULL)
+     (*r)->base.cor=BLACK;
     return resp;
 }
 Curso* buscarCurso(Curso *raiz, int cod){
@@ -196,29 +186,14 @@ Disciplina* inserirDisciplina(Disciplina *r, int cod, char nome[], int bloco, in
     return r;
 }
 int add_ArvDisciplina(Disciplina **r, int cod, char nome[], int bloco, int cargahr, Curso *curso) {
-    int resp = 1;
-    int status = SUCESSO;
+    
+     int resp = SUCESSO;
 
-    if (curso == NULL) {
-        status = ERRO_CURSO;
-    }
-    else if (bloco >= curso->qtdBlocos) {
-        status = ERRO_BLOCO;
-    }
-    else if (cargahr % curso->semanas != 0) {
-        status = ERRO_CARGA;
-    }
-    else {
-        *r = inserirDisciplina(*r, cod, nome, bloco, cargahr, &resp);
+    *r = inserirDisciplina( *r, cod, nome, bloco, cargahr, &resp);
+    if (*r != NULL)
+        (*r)->base.cor = BLACK;
 
-        if (*r != NULL)
-            (*r)->base.cor = BLACK;
-
-        if (resp ==  ERRO_REPETIDO)
-            status = ERRO_REPETIDO;
-    }
-
-    return status;
+    return resp;
 }
 Disciplina* buscarDisciplina(Disciplina *r, int cod) {
 
@@ -302,29 +277,45 @@ Aluno* inserirAluno(Aluno *r, int mat, char nome[], int ano, int semestre, Curso
 }
 
 int add_ArvAluno(Aluno **r, int mat, char nome[], int ano, int semestre, Curso *curso) {
-    int status = SUCESSO;
+    int resp = SUCESSO;
 
+    *r = inserirAluno( *r, mat, nome, ano, semestre, curso, &resp
+    );
 
-    if (curso == NULL) {
-        status = ERRO_CURSO;
-    } 
-   
-    else if (semestre != 1 && semestre != 2) {
-        status = ERRO_SEMESTRE;
-    } 
-    else {
-        int result = SUCESSO;
-        *r = inserirAluno(*r, mat, nome, ano, semestre, curso, &result);
+    if (*r != NULL)
+        (*r)->base.cor = BLACK;
 
-        if (result == ERRO_REPETIDO) {
-            status = ERRO_REPETIDO;
+    return resp;
+}
+Aluno* buscarAluno(Aluno *r, int mat) {
+
+    Aluno *result = NULL;
+
+    if (r != NULL) {
+
+        if (mat == r->matricula) {
+
+            result = r;
+
+        } else {
+
+            if (mat < r->matricula) {
+
+                result = buscarAluno(
+                    (Aluno*) r->base.esq,
+                    mat
+                );
+
+            } else {
+
+                result = buscarAluno(
+                    (Aluno*) r->base.dir,
+                    mat
+                );
+            }
         }
-
-        if (*r != NULL)
-            (*r)->base.cor = BLACK;
     }
-
-    return status; 
+    return result;
 }
 //1
 void mostrar_alunos_por_curso(Aluno *r, int codCurso) {
@@ -409,7 +400,7 @@ void mostrar_cursos_por_blocos(Curso *c, int qtdBlocos) {
         mostrar_cursos_por_blocos((Curso*)c->base.dir, qtdBlocos);
     }
 }
-//7 sera preciso duas funções mas a in-ordem ja garante que esta na ordem crescente 
+
 void imprimir_disciplinas(Disciplina *r) {
     if (r != NULL) {
         
@@ -436,7 +427,6 @@ void buscar_disciplinas_curso(Curso *c, int cod){
 }
 
 // Função 8 
-
 void imprimir_dados_disciplina(Curso *raizCursos,
                                int codCurso,
                                int codDisciplina,
@@ -493,9 +483,7 @@ void imprimir_dados_disciplina(Curso *raizCursos,
 // Função 9 
 
 
- void _listar_disciplinas_por_bloco(Disciplina *r,
-                                   int bloco,
-                                   int *flag) {
+ void _listar_disciplinas_por_bloco(Disciplina *r,  int bloco,  int *flag) {
 
     if (r != NULL) {
 
@@ -507,12 +495,12 @@ void imprimir_dados_disciplina(Curso *raizCursos,
 
         if (r->bloco == bloco) {
 
-            printf("------------------------------\n");
+           
             printf("Codigo     : %d\n", r->codigo);
             printf("Nome       : %s\n", r->nome);
             printf("Bloco      : %d\n", r->bloco);
             printf("Carga Hor. : %d h\n", r->cargahr);
-            printf("------------------------------\n");
+         
 
             *flag = SUCESSO;
         }
@@ -553,7 +541,6 @@ void listar_disciplinas_por_bloco(Curso *raizCursos,
     }
 }
 
-// Função 10
 
  void _listar_disciplinas_por_carga(Disciplina *r,
                                           int cargahr,
@@ -569,12 +556,12 @@ void listar_disciplinas_por_bloco(Curso *raizCursos,
 
         if (r->cargahr == cargahr) {
 
-            printf("------------------------------\n");
+            
             printf("Codigo     : %d\n", r->codigo);
             printf("Nome       : %s\n", r->nome);
             printf("Bloco      : %d\n", r->bloco);
             printf("Carga Hor. : %d h\n", r->cargahr);
-            printf("------------------------------\n");
+           
 
             *flag = SUCESSO;
         }
@@ -614,6 +601,7 @@ void listar_disciplinas_por_carga(Curso *raizCursos,
         );
     }
 }
+
 
 
 Nobase* moverDireitaRED(Nobase *r) {
@@ -851,7 +839,7 @@ Curso* removerCurso(Curso *r, int cod) {
 
 int remove_curso_arv(Curso **raizCursos, int codCurso) {
 
-    int    status = SUCESSO;
+    int status = SUCESSO;
     Curso *curso  = NULL;
 
     curso = buscarCurso(*raizCursos, codCurso);
