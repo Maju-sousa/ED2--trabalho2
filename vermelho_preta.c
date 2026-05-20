@@ -348,7 +348,40 @@ void mostrar_alunos_por_ano(Aluno *a, int codCurso, int ano){
     }
 
 }
-//3 e 4 com lucrecia 
+//3 
+void contar_alunos_por_curso(Aluno *r, int codCurso, int *contador) {
+
+    if (r != NULL) {
+
+        contar_alunos_por_curso((Aluno*) r->base.esq, codCurso, contador);
+
+        if (r->curso != NULL && r->curso->codigo == codCurso) {
+            (*contador)++;
+        }
+
+        contar_alunos_por_curso((Aluno*) r->base.dir, codCurso, contador);
+    }
+}
+
+
+// 4 
+
+void imprimir_cursos_em_ordem(Curso *r) {
+
+    if (r != NULL) {
+
+        imprimir_cursos_em_ordem((Curso*) r->base.esq);
+
+        printf("------------------------------\n");
+        printf("Codigo   : %d\n",  r->codigo);
+        printf("Nome     : %s\n",  r->nome);
+        printf("Blocos   : %d\n",  r->qtdBlocos);
+        printf("Semanas  : %d\n",  r->semanas);
+        printf("------------------------------\n");
+
+        imprimir_cursos_em_ordem((Curso*) r->base.dir);
+    }
+}
 
 //5
 void mostrar_curso(Curso *r, int codCurso){
@@ -401,6 +434,197 @@ void buscar_disciplinas_curso(Curso *c, int cod){
         }
     }
 }
+
+// Função 8 
+
+static void _buscar_curso_rec(Curso *r, int codCurso, Curso **encontrado) {
+
+    if (r != NULL && *encontrado == NULL) {
+
+        if (codCurso == r->codigo) {
+            *encontrado = r;
+        }
+        else if (codCurso < r->codigo) {
+            _buscar_curso_rec((Curso*) r->base.esq, codCurso, encontrado);
+        }
+        else {
+            _buscar_curso_rec((Curso*) r->base.dir, codCurso, encontrado);
+        }
+    }
+}
+
+static void _buscar_disciplina_rec(Disciplina *r, int codDisc,
+                                    Disciplina **encontrada) {
+
+    if (r != NULL && *encontrada == NULL) {
+
+        if (codDisc == r->codigo) {
+            *encontrada = r;
+        }
+        else if (codDisc < r->codigo) {
+            _buscar_disciplina_rec(
+                (Disciplina*) r->base.esq,
+                codDisc,
+                encontrada
+            );
+        }
+        else {
+            _buscar_disciplina_rec(
+                (Disciplina*) r->base.dir,
+                codDisc,
+                encontrada
+            );
+        }
+    }
+}
+
+void imprimir_dados_disciplina(Curso *raizCursos,
+                                int codCurso,
+                                int codDisciplina,
+                                int *flag) {
+
+    Curso      *cursoEncontrado      = NULL;
+    Disciplina *disciplinaEncontrada = NULL;
+
+    _buscar_curso_rec(raizCursos, codCurso, &cursoEncontrado);
+
+    if (cursoEncontrado == NULL) {
+
+        *flag = ERRO_CURSO;
+
+    } else {
+
+        _buscar_disciplina_rec(
+            cursoEncontrado->raizdisciplinas,
+            codDisciplina,
+            &disciplinaEncontrada
+        );
+
+        if (disciplinaEncontrada == NULL) {
+
+            *flag = ERRO_DISCIPLINA;
+
+        } else {
+
+            printf("------------------------------\n");
+            printf("Codigo     : %d\n", disciplinaEncontrada->codigo);
+            printf("Nome       : %s\n", disciplinaEncontrada->nome);
+            printf("Bloco      : %d\n", disciplinaEncontrada->bloco);
+            printf("Carga Hor. : %d h\n", disciplinaEncontrada->cargahr);
+            printf("Curso      : %s (cod. %d)\n",
+                   cursoEncontrado->nome,
+                   cursoEncontrado->codigo);
+            printf("------------------------------\n");
+
+            *flag = SUCESSO;
+        }
+    }
+}
+
+
+// Função 9 
+
+
+static void _listar_disciplinas_por_bloco(Disciplina *r,
+                                           int bloco,
+                                           int *flag) {
+    if (r != NULL) {
+
+        _listar_disciplinas_por_bloco(
+            (Disciplina*) r->base.esq, bloco, flag);
+
+        if (r->bloco == bloco) {
+            printf("------------------------------\n");
+            printf("Codigo     : %d\n",   r->codigo);
+            printf("Nome       : %s\n",   r->nome);
+            printf("Bloco      : %d\n",   r->bloco);
+            printf("Carga Hor. : %d h\n", r->cargahr);
+            printf("------------------------------\n");
+            *flag = SUCESSO;
+        }
+
+        _listar_disciplinas_por_bloco(
+            (Disciplina*) r->base.dir, bloco, flag);
+    }
+}
+
+void listar_disciplinas_por_bloco(Curso *raizCursos,
+                                   int codCurso,
+                                   int bloco,
+                                   int *flag) {
+
+    Curso *cursoEncontrado = NULL;
+
+    _buscar_curso_rec(raizCursos, codCurso, &cursoEncontrado);
+
+    if (cursoEncontrado == NULL) {
+
+        *flag = ERRO_CURSO;
+
+    } else {
+
+        *flag = ERRO_DISCIPLINA;
+
+        _listar_disciplinas_por_bloco(
+            cursoEncontrado->raizdisciplinas,
+            bloco,
+            flag
+        );
+        
+    }
+}
+
+// Função 10
+
+static void _listar_disciplinas_por_carga(Disciplina *r,
+                                           int cargahr,
+                                           int *flag) {
+    if (r != NULL) {
+
+        _listar_disciplinas_por_carga(
+            (Disciplina*) r->base.esq, cargahr, flag);
+
+        if (r->cargahr == cargahr) {
+            printf("------------------------------\n");
+            printf("Codigo     : %d\n",   r->codigo);
+            printf("Nome       : %s\n",   r->nome);
+            printf("Bloco      : %d\n",   r->bloco);
+            printf("Carga Hor. : %d h\n", r->cargahr);
+            printf("------------------------------\n");
+            *flag = SUCESSO;
+        }
+
+        _listar_disciplinas_por_carga(
+            (Disciplina*) r->base.dir, cargahr, flag);
+    }
+}
+
+void listar_disciplinas_por_carga(Curso *raizCursos,
+                                   int codCurso,
+                                   int cargahr,
+                                   int *flag) {
+
+    Curso *cursoEncontrado = NULL;
+
+    _buscar_curso_rec(raizCursos, codCurso, &cursoEncontrado);
+
+    if (cursoEncontrado == NULL) {
+
+        *flag = ERRO_CURSO;
+
+    } else {
+
+        *flag = ERRO_DISCIPLINA;
+
+        _listar_disciplinas_por_carga(
+            cursoEncontrado->raizdisciplinas,
+            cargahr,
+            flag
+        );
+    }
+}
+
+
 //Lucrecia essas funções são auxuliares das funções de remoção use então não precisa fazer elas novamente so fazer 
 // a função 12 normal tenta seguir a mesma estrutura de remoção da 11 que fez aqui a baixo
 
@@ -569,6 +793,95 @@ int remove_disciplina_arv(Curso *raizCursos, int codCurso, int codDisc) {
             if (curso->raizdisciplinas != NULL)
                 curso->raizdisciplinas->base.cor = BLACK;
         }
+    }
+
+    return status;
+}
+
+
+Curso* removerCurso(Curso *r, int cod) {
+
+    if (cod < r->codigo) {
+
+        if (cor(r->base.esq) == BLACK &&
+            cor(r->base.esq->esq) == BLACK) {
+            r = (Curso*) moverEsquerdaRED((Nobase*) r);
+        }
+
+        r->base.esq =
+            (Nobase*) removerCurso(
+                (Curso*) r->base.esq,
+                cod
+            );
+
+    } else {
+
+        if (cor(r->base.esq) == RED)
+            r = (Curso*) rotacionaDireita((Nobase*) r);
+
+        if (cod == r->codigo &&
+            r->base.dir == NULL) {
+            free(r);
+            r = NULL;
+        }
+        else {
+
+            if (cor(r->base.dir) == BLACK &&
+                cor(r->base.dir->esq) == BLACK) {
+                r = (Curso*) moverDireitaRED((Nobase*) r);
+            }
+
+            if (cod == r->codigo) {
+
+                Curso *aux;
+                aux = (Curso*) procurarMenor(r->base.dir);
+
+                r->codigo    = aux->codigo;
+                strcpy(r->nome, aux->nome);
+                r->qtdBlocos = aux->qtdBlocos;
+                r->semanas   = aux->semanas;
+                r->raizdisciplinas = aux->raizdisciplinas;
+
+                r->base.dir = removerMenor(r->base.dir);
+
+            } else {
+
+                r->base.dir =
+                    (Nobase*) removerCurso(
+                        (Curso*) r->base.dir,
+                        cod
+                    );
+            }
+        }
+    }
+
+    if (r != NULL)
+        r = (Curso*) balancear((Nobase*) r);
+
+    return r;
+}
+
+int remove_curso_arv(Curso **raizCursos, int codCurso) {
+
+    int    status = SUCESSO;
+    Curso *curso  = NULL;
+
+    curso = buscarCurso(*raizCursos, codCurso);
+
+    if (curso == NULL) {
+
+        status = ERRO_CURSO;
+
+    } else if (curso->raizdisciplinas != NULL) {
+
+        status = ERRO_DISCIPLINA;
+
+    } else {
+
+        *raizCursos = removerCurso(*raizCursos, codCurso);
+
+        if (*raizCursos != NULL)
+            (*raizCursos)->base.cor = BLACK;
     }
 
     return status;
